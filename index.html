@@ -80,6 +80,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 /* UPCOMING */
 .sec-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); margin-bottom: 3px; }
 .sec-sub { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+.sec-divider { border: none; border-top: 1px solid var(--border); margin: 36px 0 28px; }
 .upc-list { display: flex; flex-direction: column; gap: 9px; margin-bottom: 28px; }
 .upc { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; box-shadow: var(--sh); cursor: pointer; transition: all .2s; }
 .upc:hover { box-shadow: var(--sh2); border-color: var(--sage-lt); }
@@ -285,7 +286,9 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
     <div class="upc-list" id="upcList"><div class="loading"><div class="spinner"></div></div></div>
     <p class="sec-title">Calendrier 2026</p>
     <div class="cal-grid" id="calGrid"><div class="loading"><div class="spinner"></div></div></div>
-    <div class="kpi-grid" style="margin-top:28px">
+    <hr class="sec-divider"/>
+    <p class="sec-title">Indicateurs</p>
+    <div class="kpi-grid">
       <div class="kpi k1"><div class="kpi-icon">📋</div><div class="kpi-val" id="k-actions">—</div><div class="kpi-lbl">Actions</div></div>
       <div class="kpi k2"><div class="kpi-icon">💶</div><div class="kpi-val" id="k-budget">—</div><div class="kpi-lbl">Budget prévisionnel</div></div>
       <div class="kpi k3"><div class="kpi-icon">📊</div><div class="kpi-val" id="k-depense">—</div><div class="kpi-lbl">Dépensé à date</div></div>
