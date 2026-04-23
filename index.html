@@ -301,10 +301,10 @@ tbody td { padding: 11px 13px; vertical-align: middle; font-size: 13px; }
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th>#</th><th>Action</th><th>Catégorie</th><th>Date</th><th>Pilote</th>
-          <th>Statut</th><th>Score</th><th>Budget</th><th>Prochaine étape</th>
+          <th>#</th><th>Action</th><th>Date</th><th>Pilote</th>
+          <th>Statut</th><th>Budget</th><th>Prochaine étape</th>
         </tr></thead>
-        <tbody id="actBody"><tr><td colspan="9"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        <tbody id="actBody"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
       </table>
     </div>
   </section>
@@ -620,14 +620,12 @@ function renderCharts() {
 const PILOTES = ['Fred','Andy','Adélaïde','Luis'];
 function renderTable() {
   const tb = document.getElementById('actBody');
-  if (!db.actions.length) { tb.innerHTML='<tr><td colspan="9"><div class="empty">Aucune action</div></td></tr>'; return; }
+  if (!db.actions.length) { tb.innerHTML='<tr><td colspan="7"><div class="empty">Aucune action</div></td></tr>'; return; }
   tb.innerHTML = db.actions.map((a,i) => {
-    const sc = a.score>=10?'s-hi':a.score>=6?'s-md':'s-lo';
     return `<tr>
       <td style="color:var(--muted);font-size:12px">${i+1}</td>
       <td><span class="ed" onclick="inlineEdit(this,${a.id},'emoji')" style="font-size:15px" title="Modifier l'emoji">${a.emoji||'—'}</span><span class="ed" onclick="inlineEdit(this,${a.id},'titre')" style="font-weight:500" title="Cliquer pour renommer">${a.titre}</span><span class="act-go" onclick="openTaches(${a.id})" title="Voir les tâches de cette action">→</span></td>
-      <td><span style="font-size:12px;color:var(--muted)">${a.categorie||'—'}</span></td>
-      <td style="font-size:12px;white-space:nowrap">${fmtDate(a.date_action)}</td>
+      <td style="font-size:12px;white-space:nowrap"><span class="ed" onclick="inlineEditDate(this,${a.id},'date_action')" title="Modifier la date">${fmtDate(a.date_action)}</span></td>
       <td>
         <select class="ed-select" onchange="updateAction(${a.id},'pilote',this.value)">
           <option value=""${!a.pilote?' selected':''}>—</option>
@@ -640,8 +638,7 @@ function renderTable() {
             .map(s=>`<option${s===a.statut?' selected':''}>${s}</option>`).join('')}
         </select>
       </td>
-      <td><span class="score ${sc}">${a.score}</span></td>
-      <td style="font-weight:500;white-space:nowrap">${fmt(a.budget)} €</td>
+      <td style="white-space:nowrap"><span class="ed" onclick="inlineEditNum(this,${a.id},'budget')" title="Modifier le budget">${fmt(a.budget)} €</span></td>
       <td><span class="ed" onclick="inlineEdit(this,${a.id},'prochaine_etape')" style="max-width:190px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${a.prochaine_etape||''}">${a.prochaine_etape||'<span style="color:var(--muted)">—</span>'}</span></td>
     </tr>`;
   }).join('');
@@ -663,10 +660,20 @@ function inlineEdit(span, id, field) {
 function inlineEditNum(span, id, field) {
   const a = db.actions.find(x=>x.id===id);
   const inp = document.createElement('input');
-  inp.className = 'ed-input'; inp.type='number'; inp.value=a[field]||0; inp.style.width='70px';
+  inp.className = 'ed-input'; inp.type='number'; inp.value=a[field]||0; inp.style.width='90px';
   span.replaceWith(inp); inp.focus(); inp.select();
   inp.addEventListener('blur', () => updateAction(id, field, parseInt(inp.value)||0));
   inp.addEventListener('keydown', e => { if(e.key==='Enter') inp.blur(); });
+}
+
+function inlineEditDate(span, id, field) {
+  const a = db.actions.find(x=>x.id===id);
+  const inp = document.createElement('input');
+  inp.className = 'ed-input'; inp.type='date'; inp.value=a[field]||''; inp.style.width='150px';
+  span.replaceWith(inp); inp.focus();
+  inp.addEventListener('blur', () => updateAction(id, field, inp.value));
+  inp.addEventListener('change', () => updateAction(id, field, inp.value));
+  inp.addEventListener('keydown', e => { if(e.key==='Enter') inp.blur(); if(e.key==='Escape') renderTable(); });
 }
 
 function updateAction(id, field, value) {
@@ -676,6 +683,9 @@ function updateAction(id, field, value) {
   if (field === 'titre' || field === 'emoji') {
     const newLabel = (a.emoji ? a.emoji + ' ' : '') + (a.titre || '');
     db.taches.forEach(t => { if (t.action_id === id) t.action_label = newLabel; });
+  }
+  if (field === 'date_action' && value) {
+    a.mois = new Date(value).toLocaleDateString('fr-FR',{month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   }
   renderAll();
   scheduleSave();
