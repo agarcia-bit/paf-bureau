@@ -225,14 +225,7 @@ tbody td { padding: 11px 13px; vertical-align: middle; font-size: 13px; }
 </head>
 <body>
 
-<!-- ⚠️ CONFIGURER ICI AVANT DÉPLOIEMENT -->
-<script>
-const GH_OWNER  = 'agarcia-bit';   // ex: agarcia-bit
-const GH_REPO   = 'paf-bureau';       // ex: paf-pilotage-2026
-const GH_BRANCH = 'main';
-const GH_TOKEN  = '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'; // ghp_xxxxx
-const GH_FILE   = 'data.json';
-</script>
+<!-- Pas de token ici — géré côté serveur via Netlify Function -->
 
 <div class="save-bar" id="saveBar">✓ Sauvegardé</div>
 
@@ -355,28 +348,23 @@ const GH_FILE   = 'data.json';
 
 <script>
 // ══════════════════════════════════════
-// GITHUB API
+// API — via Netlify Function (proxy)
 // ══════════════════════════════════════
-const RAW_URL = `https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/${GH_BRANCH}/${GH_FILE}`;
-const API_URL = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`;
-const CONFIGURED = !GH_OWNER.includes('VOTRE');
+const PROXY = '/api/github';
 
 let db = { actions: [], taches: [], adherents: [] };
-let ghSha = null; // SHA du fichier, requis pour le PUT GitHub
+let ghSha = null;
 let charts = {};
 let saveTimer = null;
 
 async function loadData() {
-  if (!CONFIGURED) { showConfigBanner(); loadDemo(); return; }
   try {
-    // Lecture via raw (pas de cache GitHub API)
-    const r = await fetch(RAW_URL + '?t=' + Date.now());
-    if (!r.ok) throw new Error('Fichier introuvable');
-    db = await r.json();
-    // Récupérer le SHA pour les sauvegardes
-    const meta = await fetch(API_URL, { headers: { Authorization: `Bearer ${GH_TOKEN}`, Accept: 'application/vnd.github+json' } });
-    const m = await meta.json();
-    ghSha = m.sha;
+    const r = await fetch(PROXY);
+    if (!r.ok) throw new Error('Erreur chargement');
+    const meta = await r.json();
+    ghSha = meta.sha;
+    const content = JSON.parse(atob(meta.content.replace(/\n/g, '')));
+    db = content;
     renderAll();
   } catch(e) {
     console.error(e);
@@ -386,14 +374,13 @@ async function loadData() {
 }
 
 async function saveData() {
-  if (!CONFIGURED) return;
   flash('saving', '⏳ Sauvegarde…');
   try {
     const content = btoa(unescape(encodeURIComponent(JSON.stringify(db, null, 2))));
-    const r = await fetch(API_URL, {
+    const r = await fetch(PROXY, {
       method: 'PUT',
-      headers: { Authorization: `Bearer ${GH_TOKEN}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'PAF update', content, sha: ghSha, branch: GH_BRANCH })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: 'PAF update', content, sha: ghSha, branch: 'main' })
     });
     if (!r.ok) throw new Error(await r.text());
     const data = await r.json();
@@ -685,9 +672,9 @@ function saveNewAction() {
 function showConfigBanner() {
   const b = document.createElement('div');
   b.className = 'cfg-banner';
-  b.innerHTML = `<div style="font-size:22px">⚙️</div><div>
-    <strong>Configuration GitHub requise</strong><br/>
-    <span style="font-size:13px;opacity:.8">Éditez <code>index.html</code> et renseignez <code>GH_OWNER</code>, <code>GH_REPO</code> et <code>GH_TOKEN</code>.<br/>Mode démo actif — les modifications ne sont pas sauvegardées.</span>
+  b.innerHTML = `<div style="font-size:22px">⚠️</div><div>
+    <strong>Impossible de joindre le serveur</strong><br/>
+    <span style="font-size:13px;opacity:.8">Mode démo actif — les modifications ne sont pas sauvegardées. Vérifiez la Netlify Function et le token GH_TOKEN.</span>
   </div>`;
   document.querySelector('.main').prepend(b);
 }
