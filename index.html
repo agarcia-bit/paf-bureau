@@ -241,7 +241,7 @@ tbody td { padding: 11px 13px; vertical-align: middle; font-size: 13px; }
     <button class="nb on"  onclick="nav('dashboard',this)">📊 <span>Dashboard</span></button>
     <button class="nb"     onclick="nav('pilotage',this)">📋 <span>Actions</span></button>
     <button class="nb"     onclick="nav('taches',this)">✅ <span>Tâches</span></button>
-    <button class="nb"     onclick="nav('adherents',this)">👥 <span>Adhérents</span></button>
+
   </nav>
 </header>
 
@@ -309,12 +309,7 @@ tbody td { padding: 11px 13px; vertical-align: middle; font-size: 13px; }
     <div class="taches-list" id="tList"><div class="loading"><div class="spinner"></div></div></div>
   </section>
 
-  <!-- ADHÉRENTS -->
-  <section id="adherents" class="section">
-    <p class="sec-title">Annuaire adhérents</p>
-    <p class="sec-sub" id="aSub">Chargement…</p>
-    <div class="adh-grid" id="adhGrid"><div class="loading"><div class="spinner"></div></div></div>
-  </section>
+
 
 </main>
 
@@ -363,8 +358,9 @@ async function loadData() {
     if (!r.ok) throw new Error('Erreur chargement');
     const meta = await r.json();
     ghSha = meta.sha;
-    const content = JSON.parse(atob(meta.content.replace(/\n/g, '')));
-    db = content;
+    const raw = meta.content.replace(/\n/g, '');
+    const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
+    db = JSON.parse(new TextDecoder('utf-8').decode(bytes));
     renderAll();
   } catch(e) {
     console.error(e);
@@ -421,7 +417,7 @@ function nav(id, btn) {
 // ══════════════════════════════════════
 function renderAll() {
   renderKPIs(); renderUpcoming(); renderCalendar(); renderCharts();
-  renderTable(); renderTaches(); renderAdherents();
+  renderTable(); renderTaches();
 }
 
 // ══════════════════════════════════════
@@ -497,14 +493,22 @@ function renderCharts() {
       x:{grid:{display:false}, ticks:{font:{family:'DM Sans',size:10}}}
     }}
   });
-  const sc = {}; db.actions.forEach(a => sc[a.statut]=(sc[a.statut]||0)+1);
-  const lbls = Object.keys(sc);
-  const cols = ['#4a7c6f','#e8b84b','#e8705a','#2d2d4a','#6aad9b','#f5d47e','#7a7a8c','#1a1a2e'];
+  // Regrouper statuts en 4 catégories
+  const groupes = { 'À faire': 0, 'En cours': 0, 'Terminé': 0, 'Bloqué': 0 };
+  const aFaire = ['À lancer','À préparer','À cadrer','À planifier','À sécuriser','À monter','À organiser','À anticiper'];
+  db.actions.forEach(a => {
+    if (a.statut === 'Terminé') groupes['Terminé']++;
+    else if (a.statut === 'En cours') groupes['En cours']++;
+    else if (a.statut === 'Bloqué') groupes['Bloqué']++;
+    else groupes['À faire']++;
+  });
+  const lbls = Object.keys(groupes).filter(k => groupes[k] > 0);
+  const colMap = { 'À faire':'#e8b84b', 'En cours':'#4a7c6f', 'Terminé':'#6aad9b', 'Bloqué':'#e8705a' };
   if(charts.s) charts.s.destroy();
   charts.s = new Chart(document.getElementById('chStatut').getContext('2d'), {
     type:'doughnut',
-    data:{ labels:lbls, datasets:[{ data:lbls.map(s=>sc[s]), backgroundColor:cols, borderWidth:2, borderColor:'#fff' }] },
-    options:{ responsive:true, cutout:'65%', plugins:{ legend:{ position:'bottom', labels:{ font:{family:'DM Sans',size:11}, padding:10 } } } }
+    data:{ labels:lbls, datasets:[{ data:lbls.map(k=>groupes[k]), backgroundColor:lbls.map(k=>colMap[k]), borderWidth:2, borderColor:'#fff' }] },
+    options:{ responsive:true, cutout:'65%', plugins:{ legend:{ position:'bottom', labels:{ font:{family:'DM Sans',size:13}, padding:16, boxWidth:14 } } } }
   });
 }
 
