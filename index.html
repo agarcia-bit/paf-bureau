@@ -280,7 +280,12 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
   <section id="dashboard" class="section on">
     <h1 class="hero-title">Bonjour, bureau PAF 👋</h1>
     <p class="hero-sub">Saison 2026 · Promouvoir, Animer, Fédérer</p>
-    <div class="kpi-grid">
+    <p class="sec-title">À venir</p>
+    <p class="sec-sub">Les 5 prochaines actions</p>
+    <div class="upc-list" id="upcList"><div class="loading"><div class="spinner"></div></div></div>
+    <p class="sec-title">Calendrier 2026</p>
+    <div class="cal-grid" id="calGrid"><div class="loading"><div class="spinner"></div></div></div>
+    <div class="kpi-grid" style="margin-top:28px">
       <div class="kpi k1"><div class="kpi-icon">📋</div><div class="kpi-val" id="k-actions">—</div><div class="kpi-lbl">Actions</div></div>
       <div class="kpi k2"><div class="kpi-icon">💶</div><div class="kpi-val" id="k-budget">—</div><div class="kpi-lbl">Budget prévisionnel</div></div>
       <div class="kpi k3"><div class="kpi-icon">📊</div><div class="kpi-val" id="k-depense">—</div><div class="kpi-lbl">Dépensé à date</div></div>
@@ -291,15 +296,10 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
       <div class="bgt-track"><div class="bgt-fill" id="bgtFill" style="width:0%"></div></div>
       <div class="bgt-lbls"><span>0 €</span><span><strong id="bgtPct">0%</strong> consommé</span><span id="bgtTot">—</span></div>
     </div>
-    <p class="sec-title">À venir</p>
-    <p class="sec-sub">Les 5 prochaines actions</p>
-    <div class="upc-list" id="upcList"><div class="loading"><div class="spinner"></div></div></div>
     <div class="charts-row">
       <div class="ch-card"><h3>Budget par mois</h3><canvas id="chBudget" height="200"></canvas></div>
       <div class="ch-card"><h3>Actions par statut</h3><canvas id="chStatut" height="200"></canvas></div>
     </div>
-    <p class="sec-title">Calendrier 2026</p>
-    <div class="cal-grid" id="calGrid"><div class="loading"><div class="spinner"></div></div></div>
   </section>
 
   <!-- PILOTAGE -->
