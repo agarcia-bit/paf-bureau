@@ -108,8 +108,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .cal-evt { padding: 7px 9px; border-radius: 7px; margin-bottom: 5px; font-size: 11px; border-left: 3px solid var(--sage); background: rgba(74,124,111,.06); transition: all .15s; cursor: pointer; }
 .cal-evt:hover { background: rgba(74,124,111,.12); }
 .cal-evt-ttl { font-weight: 500; color: var(--ink); }
-.act-link { font-weight: 500; cursor: pointer; border-bottom: 1px dashed transparent; transition: border-color .15s, color .15s; }
-.act-link:hover { color: var(--sage); border-bottom-color: var(--sage); }
+.act-go { display:inline-block; margin-left:6px; padding:0 6px; border-radius:4px; color:var(--muted); font-weight:600; cursor:pointer; transition:all .15s; text-decoration:none; user-select:none; }
+.act-go:hover { background:var(--sage); color:#fff; }
 .cal-evt-meta { color: var(--muted); font-size: 10px; }
 
 /* TABLE */
@@ -156,7 +156,31 @@ tbody td { padding: 11px 13px; vertical-align: middle; font-size: 13px; }
 .f-sel { border: 1px solid var(--border); border-radius: 8px; padding: 7px 11px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: #fff; outline: none; cursor: pointer; }
 .f-input:focus, .f-sel:focus { border-color: var(--sage); }
 .taches-list { display: flex; flex-direction: column; gap: 7px; }
-.tache { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 13px 17px; display: grid; grid-template-columns: 22px 1fr auto auto; gap: 14px; align-items: center; box-shadow: var(--sh); transition: all .2s; }
+.tache { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 13px 17px; display: grid; grid-template-columns: 22px 1fr auto auto auto; gap: 14px; align-items: center; box-shadow: var(--sh); transition: all .2s; }
+.t-resp { min-width: 90px; }
+
+/* ÉQUIPE */
+.equipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 16px; }
+.eq-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 20px 22px; box-shadow: var(--sh); }
+.eq-card.eq-orphan { border-style: dashed; background: rgba(232,112,90,.04); }
+.eq-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+.eq-name { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); }
+.eq-count { background: var(--sage); color: #fff; border-radius: 20px; padding: 2px 10px; font-size: 11px; font-weight: 600; }
+.eq-orphan .eq-count { background: var(--blush); }
+.eq-sect { font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--muted); margin: 12px 0 6px; }
+.eq-empty { color: var(--muted); font-size: 13px; font-style: italic; padding: 8px 0; }
+.eq-row { display: grid; grid-template-columns: 24px 1fr auto auto; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; transition: background .15s; font-size: 13px; }
+.eq-row:hover { background: var(--bg); }
+.eq-row[onclick] { cursor: pointer; }
+.eq-row .tck { width: 18px; height: 18px; }
+.eq-emoji { font-size: 16px; text-align: center; }
+.eq-info { min-width: 0; }
+.eq-ttl { font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eq-ttl.done { text-decoration: line-through; opacity: .5; }
+.eq-meta { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eq-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.eq-row.eq-late { background: rgba(232,112,90,.08); }
+.eq-row.eq-late .eq-date { color: var(--blush); font-weight: 600; }
 .tache:hover { box-shadow: var(--sh2); }
 .tck { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
 .tck.done { background: var(--sage); border-color: var(--sage); }
@@ -236,7 +260,7 @@ tbody td { padding: 11px 13px; vertical-align: middle; font-size: 13px; }
     <button class="nb on"  onclick="nav('dashboard',this)">📊 <span>Dashboard</span></button>
     <button class="nb"     onclick="nav('pilotage',this)">📋 <span>Actions</span></button>
     <button class="nb"     onclick="nav('taches',this)">✅ <span>Tâches</span></button>
-
+    <button class="nb"     onclick="nav('equipe',this)">👥 <span>Équipe</span></button>
   </nav>
 </header>
 
@@ -300,11 +324,21 @@ tbody td { padding: 11px 13px; vertical-align: middle; font-size: 13px; }
         <option value="">Tous statuts</option>
         <option>À faire</option><option>En cours</option><option>Terminé</option>
       </select>
+      <select class="f-sel" id="tResp" onchange="renderTaches()">
+        <option value="">Tous responsables</option>
+        <option value="__none__">Non assigné</option>
+        <option>Fred</option><option>Andy</option><option>Adélaïde</option><option>Luis</option>
+      </select>
     </div>
     <div class="taches-list" id="tList"><div class="loading"><div class="spinner"></div></div></div>
   </section>
 
-
+  <!-- ÉQUIPE -->
+  <section id="equipe" class="section">
+    <p class="sec-title">Qui fait quoi</p>
+    <p class="sec-sub" id="eSub">Répartition des actions et tâches par personne</p>
+    <div class="equipe-grid" id="eqGrid"><div class="loading"><div class="spinner"></div></div></div>
+  </section>
 
 </main>
 
@@ -435,7 +469,64 @@ function openTaches(actionId) {
 // ══════════════════════════════════════
 function renderAll() {
   renderKPIs(); renderUpcoming(); renderCalendar(); renderCharts();
-  renderTable(); renderTaches();
+  renderTable(); renderTaches(); renderEquipe();
+}
+
+function renderEquipe() {
+  const today = new Date().toISOString().split('T')[0];
+  const el = document.getElementById('eqGrid');
+
+  const buildActionRow = a => {
+    const late = a.date_action && a.date_action < today && a.statut !== 'Terminé';
+    return `<div class="eq-row${late?' eq-late':''}" onclick="openTaches(${a.id})" title="Voir les tâches">
+      <div class="eq-emoji">${a.emoji||'📅'}</div>
+      <div class="eq-info"><div class="eq-ttl">${a.titre}</div><div class="eq-meta">${a.categorie||''}</div></div>
+      <div class="eq-date">${fmtDate(a.date_action)}</div>
+      ${badge(a.statut)}
+    </div>`;
+  };
+  const buildTacheRow = t => {
+    const late = t.echeance && t.echeance < today && t.statut !== 'Terminé';
+    const isDone = t.statut === 'Terminé';
+    return `<div class="eq-row${late?' eq-late':''}">
+      <div class="tck${isDone?' done':''}" onclick="toggleTache(${t.id})"></div>
+      <div class="eq-info"><div class="eq-ttl${isDone?' done':''}">${t.tache}</div><div class="eq-meta">${t.action_label||''}</div></div>
+      <div class="eq-date">${fmtDate(t.echeance)}</div>
+    </div>`;
+  };
+
+  const groups = PILOTES.map(person => {
+    const actions = db.actions.filter(a => a.pilote === person)
+      .sort((x,y) => (x.date_action||'').localeCompare(y.date_action||''));
+    const taches = db.taches.filter(t => t.responsable === person)
+      .sort((x,y) => (x.echeance||'').localeCompare(y.echeance||''));
+    return { person, actions, taches };
+  });
+
+  const orphanA = db.actions.filter(a => !a.pilote)
+    .sort((x,y) => (x.date_action||'').localeCompare(y.date_action||''));
+  const orphanT = db.taches.filter(t => !t.responsable)
+    .sort((x,y) => (x.echeance||'').localeCompare(y.echeance||''));
+
+  const cards = groups.map(g => {
+    const total = g.actions.length + g.taches.length;
+    return `<div class="eq-card">
+      <div class="eq-head"><span class="eq-name">${g.person}</span><span class="eq-count">${total}</span></div>
+      ${total === 0 ? '<div class="eq-empty">Rien d\'assigné</div>' : ''}
+      ${g.actions.length ? `<div class="eq-sect">📋 Actions pilotées</div>${g.actions.map(buildActionRow).join('')}` : ''}
+      ${g.taches.length ? `<div class="eq-sect">✅ Tâches</div>${g.taches.map(buildTacheRow).join('')}` : ''}
+    </div>`;
+  });
+
+  if (orphanA.length || orphanT.length) {
+    cards.push(`<div class="eq-card eq-orphan">
+      <div class="eq-head"><span class="eq-name">Non assigné</span><span class="eq-count">${orphanA.length + orphanT.length}</span></div>
+      ${orphanA.length ? `<div class="eq-sect">📋 Actions sans pilote</div>${orphanA.map(buildActionRow).join('')}` : ''}
+      ${orphanT.length ? `<div class="eq-sect">✅ Tâches sans responsable</div>${orphanT.map(buildTacheRow).join('')}` : ''}
+    </div>`);
+  }
+
+  el.innerHTML = cards.join('');
 }
 
 // ══════════════════════════════════════
@@ -534,7 +625,7 @@ function renderTable() {
     const sc = a.score>=10?'s-hi':a.score>=6?'s-md':'s-lo';
     return `<tr>
       <td style="color:var(--muted);font-size:12px">${i+1}</td>
-      <td><span style="font-size:15px;margin-right:5px">${a.emoji||''}</span><span class="act-link" onclick="openTaches(${a.id})" title="Voir les tâches de cette action">${a.titre}</span></td>
+      <td><span class="ed" onclick="inlineEdit(this,${a.id},'emoji')" style="font-size:15px" title="Modifier l'emoji">${a.emoji||'—'}</span><span class="ed" onclick="inlineEdit(this,${a.id},'titre')" style="font-weight:500" title="Cliquer pour renommer">${a.titre}</span><span class="act-go" onclick="openTaches(${a.id})" title="Voir les tâches de cette action">→</span></td>
       <td><span style="font-size:12px;color:var(--muted)">${a.categorie||'—'}</span></td>
       <td style="font-size:12px;white-space:nowrap">${fmtDate(a.date_action)}</td>
       <td>
@@ -582,6 +673,10 @@ function updateAction(id, field, value) {
   const a = db.actions.find(x=>x.id===id);
   if (!a) return;
   a[field] = value;
+  if (field === 'titre' || field === 'emoji') {
+    const newLabel = (a.emoji ? a.emoji + ' ' : '') + (a.titre || '');
+    db.taches.forEach(t => { if (t.action_id === id) t.action_label = newLabel; });
+  }
   renderAll();
   scheduleSave();
 }
@@ -594,6 +689,7 @@ function renderTaches() {
   const fa = document.getElementById('tAction').value;
   const fp = document.getElementById('tPrio').value;
   const fs = document.getElementById('tStatut').value;
+  const fr = document.getElementById('tResp').value;
 
   // Rebuild action select
   const sel = document.getElementById('tAction');
@@ -606,6 +702,8 @@ function renderTaches() {
     if(fa && t.action_label!==fa) return false;
     if(fp && t.priorite!==fp) return false;
     if(fs && t.statut!==fs) return false;
+    if(fr === '__none__' && t.responsable) return false;
+    if(fr && fr !== '__none__' && t.responsable !== fr) return false;
     return true;
   });
 
@@ -621,9 +719,21 @@ function renderTaches() {
       <div class="tck${isDone?' done':''}" onclick="toggleTache(${t.id})"></div>
       <div><div class="t-al">${t.action_label||''}</div><div class="t-ttl${isDone?' done':''}">${t.tache}</div></div>
       <div class="pdot ${pc}" title="${t.priorite||''}"></div>
+      <select class="ed-select t-resp" onchange="updateTache(${t.id},'responsable',this.value)" onclick="event.stopPropagation()">
+        <option value=""${!t.responsable?' selected':''}>—</option>
+        ${PILOTES.map(p=>`<option${p===t.responsable?' selected':''}>${p}</option>`).join('')}
+      </select>
       <div class="t-date">${fmtDate(t.echeance)}</div>
     </div>`;
   }).join('');
+}
+
+function updateTache(id, field, value) {
+  const t = db.taches.find(x => x.id === id);
+  if (!t) return;
+  t[field] = value;
+  renderAll();
+  scheduleSave();
 }
 
 function toggleTache(id) {
