@@ -105,9 +105,11 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .cal-month { background: var(--card); border: 1px solid var(--border); border-radius: var(--r); padding: 18px; box-shadow: var(--sh); }
 .cal-mname { font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--sage); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
 .cal-count { background: var(--sage); color: #fff; border-radius: 20px; padding: 1px 7px; font-size: 10px; }
-.cal-evt { padding: 7px 9px; border-radius: 7px; margin-bottom: 5px; font-size: 11px; border-left: 3px solid var(--sage); background: rgba(74,124,111,.06); transition: all .15s; cursor: default; }
+.cal-evt { padding: 7px 9px; border-radius: 7px; margin-bottom: 5px; font-size: 11px; border-left: 3px solid var(--sage); background: rgba(74,124,111,.06); transition: all .15s; cursor: pointer; }
 .cal-evt:hover { background: rgba(74,124,111,.12); }
 .cal-evt-ttl { font-weight: 500; color: var(--ink); }
+.act-link { font-weight: 500; cursor: pointer; border-bottom: 1px dashed transparent; transition: border-color .15s, color .15s; }
+.act-link:hover { color: var(--sage); border-bottom-color: var(--sage); }
 .cal-evt-meta { color: var(--muted); font-size: 10px; }
 
 /* TABLE */
@@ -412,6 +414,26 @@ function nav(id, btn) {
   btn.classList.add('on');
 }
 
+function navTo(id) {
+  const btn = document.querySelector(`.nb[onclick*="'${id}'"]`);
+  if (btn) nav(id, btn);
+}
+
+function openTaches(actionId) {
+  const a = db.actions.find(x => x.id === actionId);
+  if (!a) return;
+  const fromT = db.taches.find(t => t.action_id === actionId);
+  const label = fromT?.action_label || ((a.emoji ? a.emoji + ' ' : '') + a.titre);
+  navTo('taches');
+  renderTaches();
+  const sel = document.getElementById('tAction');
+  if ([...sel.options].some(o => o.value === label)) {
+    sel.value = label;
+    renderTaches();
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // ══════════════════════════════════════
 // RENDER ALL
 // ══════════════════════════════════════
@@ -447,7 +469,7 @@ function renderUpcoming() {
   if (!list.length) { el.innerHTML = '<div class="empty">Aucune action à venir</div>'; return; }
   el.innerHTML = list.map(a => {
     const d = new Date(a.date_action);
-    return `<div class="upc">
+    return `<div class="upc" onclick="openTaches(${a.id})" title="Voir les tâches de cette action">
       <div class="upc-date"><div class="upc-day">${d.getDate()}</div><div class="upc-mth">${d.toLocaleDateString('fr-FR',{month:'short'}).toUpperCase()}</div></div>
       <div class="upc-sep"></div>
       <div class="upc-emoji">${a.emoji||'📅'}</div>
@@ -470,7 +492,7 @@ function renderCalendar() {
     if (!byM[m].length) return '';
     return `<div class="cal-month">
       <div class="cal-mname">${m}<span class="cal-count">${byM[m].length}</span></div>
-      ${byM[m].map(a => `<div class="cal-evt">
+      ${byM[m].map(a => `<div class="cal-evt" onclick="openTaches(${a.id})" title="Voir les tâches de cette action">
         <div class="cal-evt-ttl">${a.emoji||''} ${a.titre}</div>
         <div class="cal-evt-meta">${fmtDate(a.date_action)} · ${fmt(a.budget)} €</div>
       </div>`).join('')}
@@ -524,7 +546,7 @@ function renderTable() {
     const sc    = a.score>=10?'s-hi':a.score>=6?'s-md':'s-lo';
     return `<tr>
       <td style="color:var(--muted);font-size:12px">${i+1}</td>
-      <td><span style="font-size:15px;margin-right:5px">${a.emoji||''}</span><span style="font-weight:500">${a.titre}</span></td>
+      <td><span style="font-size:15px;margin-right:5px">${a.emoji||''}</span><span class="act-link" onclick="openTaches(${a.id})" title="Voir les tâches de cette action">${a.titre}</span></td>
       <td><span style="font-size:12px;color:var(--muted)">${a.categorie||'—'}</span></td>
       <td style="font-size:12px;white-space:nowrap">${fmtDate(a.date_action)}</td>
       <td><span class="ed" onclick="inlineEdit(this,${a.id},'pilote')">${a.pilote||'<span style="color:var(--muted)">—</span>'}</span></td>
