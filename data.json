@@ -303,6 +303,25 @@
       "impact": 3,
       "effort": 2,
       "score": 5
+    },
+    {
+      "id": 17,
+      "emoji": "☕️",
+      "titre": "Matinale EXPERT (à définir)",
+      "categorie": "Matine Expert",
+      "date_action": "2026-11-10",
+      "mois": "Novembre",
+      "pilote": "Andy",
+      "commission": "",
+      "statut": "À faire",
+      "budget": 0,
+      "depense": 0,
+      "kpi": "",
+      "prochaine_etape": "",
+      "priorite": 3,
+      "impact": 3,
+      "effort": 2,
+      "score": 5
     }
   ],
   "taches": [
