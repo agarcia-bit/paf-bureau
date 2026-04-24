@@ -338,8 +338,10 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
 
   <!-- TÂCHES -->
   <section id="taches" class="section">
-    <p class="sec-title">Tâches opérationnelles</p>
-    <p class="sec-sub" id="tSub">Chargement…</p>
+    <div class="tbl-hdr">
+      <div><p class="sec-title">Tâches opérationnelles</p><p class="sec-sub" id="tSub">Chargement…</p></div>
+      <button class="btn-add" onclick="openModalTache()">+ Nouvelle tâche</button>
+    </div>
     <div class="filter-row">
       <input class="f-input" id="tSearch" placeholder="🔍 Rechercher…" oninput="renderTaches()"/>
       <select class="f-sel" id="tAction" onchange="renderTaches()"><option value="">Toutes les actions</option></select>
@@ -396,6 +398,40 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
     <div class="m-actions">
       <button class="btn-cancel" onclick="closeModal()">Annuler</button>
       <button class="btn-save" onclick="saveNewAction()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TÂCHE -->
+<div class="modal-bg" id="modalTBg" onclick="if(event.target===this)closeModalTache()">
+  <div class="modal">
+    <h3>Nouvelle tâche</h3>
+    <div class="fg">
+      <div class="ff full"><label>Action parente</label>
+        <select id="ft-action"></select>
+      </div>
+      <div class="ff full"><label>Tâche</label><input id="ft-tache" placeholder="Ex : Confirmer le lieu hôte"/></div>
+      <div class="ff"><label>Échéance</label><input id="ft-date" type="date"/></div>
+      <div class="ff"><label>Responsable</label>
+        <select id="ft-resp">
+          <option value="">—</option>
+          <option>Fred</option><option>Andy</option><option>Adélaïde</option><option>Luis</option>
+        </select>
+      </div>
+      <div class="ff"><label>Priorité</label>
+        <select id="ft-prio">
+          <option>Moyenne</option><option>Haute</option><option>Basse</option>
+        </select>
+      </div>
+      <div class="ff"><label>Statut</label>
+        <select id="ft-statut">
+          <option>À faire</option><option>En cours</option><option>Terminé</option>
+        </select>
+      </div>
+    </div>
+    <div class="m-actions">
+      <button class="btn-cancel" onclick="closeModalTache()">Annuler</button>
+      <button class="btn-save" onclick="saveNewTache()">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -768,7 +804,11 @@ function renderTaches() {
   // Rebuild action select
   const sel = document.getElementById('tAction');
   const cur = sel.value;
-  const labels = [...new Set(db.taches.map(t=>t.action_label||''))].filter(Boolean);
+  const actionLabels = [...db.actions]
+    .sort((a, b) => (a.date_action || '9999').localeCompare(b.date_action || '9999'))
+    .map(a => (a.emoji ? a.emoji + ' ' : '') + (a.titre || ''))
+    .filter(Boolean);
+  const labels = [...new Set([...actionLabels, ...db.taches.map(t => t.action_label || '')])].filter(Boolean);
   sel.innerHTML = '<option value="">Toutes les actions</option>' + labels.map(l=>`<option value="${l}"${l===cur?' selected':''}>${l}</option>`).join('');
 
   const list = db.taches.filter(t => {
@@ -885,6 +925,47 @@ function saveNewAction() {
     priorite:3, impact:3, effort:2, score:5.0,
   });
   closeModal();
+  renderAll();
+  scheduleSave();
+}
+
+// ══════════════════════════════════════
+// MODAL NOUVELLE TÂCHE
+// ══════════════════════════════════════
+function openModalTache() {
+  const sel = document.getElementById('ft-action');
+  const actions = [...db.actions].sort((a, b) => (a.date_action || '9999').localeCompare(b.date_action || '9999'));
+  sel.innerHTML = actions.length
+    ? actions.map(a => `<option value="${a.id}">${(a.emoji ? a.emoji + ' ' : '') + a.titre}</option>`).join('')
+    : '<option value="">Aucune action — créez-en une d\'abord</option>';
+  document.getElementById('ft-tache').value = '';
+  document.getElementById('ft-date').value = '';
+  document.getElementById('ft-resp').value = '';
+  document.getElementById('ft-prio').value = 'Moyenne';
+  document.getElementById('ft-statut').value = 'À faire';
+  document.getElementById('modalTBg').classList.add('open');
+}
+function closeModalTache() { document.getElementById('modalTBg').classList.remove('open'); }
+
+function saveNewTache() {
+  const tache = document.getElementById('ft-tache').value.trim();
+  if (!tache) { alert('Le libellé de la tâche est requis'); return; }
+  const actionId = parseInt(document.getElementById('ft-action').value);
+  const a = db.actions.find(x => x.id === actionId);
+  if (!a) { alert('Sélectionnez une action parente'); return; }
+  const newId = Math.max(0, ...db.taches.map(t => t.id)) + 1;
+  db.taches.push({
+    id: newId,
+    action_id: a.id,
+    action_label: (a.emoji ? a.emoji + ' ' : '') + (a.titre || ''),
+    tache,
+    responsable: document.getElementById('ft-resp').value,
+    echeance: document.getElementById('ft-date').value,
+    statut: document.getElementById('ft-statut').value,
+    priorite: document.getElementById('ft-prio').value,
+    note: ''
+  });
+  closeModalTache();
   renderAll();
   scheduleSave();
 }
