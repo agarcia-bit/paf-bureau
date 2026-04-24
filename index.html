@@ -29,8 +29,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 /* HEADER */
 .hdr { background: var(--ink); color: #fff; padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,.25); }
-.hdr-brand { display: flex; align-items: center; gap: 12px; }
-.hdr-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sage-lt); }
+.hdr-brand { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px 8px; border-radius: 8px; transition: background .15s; }
+.hdr-brand:hover { background: rgba(255,255,255,.06); }
+.hdr-logo { height: 44px; width: 44px; object-fit: contain; background: #fff; border-radius: 50%; padding: 3px; }
 .hdr-brand h1 { font-family: 'DM Serif Display', serif; font-size: 20px; color: #fff; }
 .hdr-brand span { font-size: 11px; font-weight: 500; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
 .nav { display: flex; gap: 4px; }
@@ -268,8 +269,8 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
 <div class="save-bar" id="saveBar">✓ Sauvegardé</div>
 
 <header class="hdr">
-  <div class="hdr-brand">
-    <div class="hdr-dot"></div>
+  <div class="hdr-brand" onclick="navTo('dashboard')" title="Retour au dashboard">
+    <img class="hdr-logo" src="logo.png" alt="PAF Wambrechies" onerror="this.style.display='none'"/>
     <div>
       <h1>PAF Wambrechies</h1>
       <span>Pilotage 2026</span>
