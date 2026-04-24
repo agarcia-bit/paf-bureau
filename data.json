@@ -322,6 +322,25 @@
       "impact": 3,
       "effort": 2,
       "score": 5
+    },
+    {
+      "id": 18,
+      "emoji": "🍽",
+      "titre": "Repas fin d'année PAF",
+      "categorie": "Repas",
+      "date_action": "2026-12-18",
+      "mois": "Décembre",
+      "pilote": "Fred",
+      "commission": "",
+      "statut": "À faire",
+      "budget": 1000,
+      "depense": 0,
+      "kpi": "",
+      "prochaine_etape": "",
+      "priorite": 3,
+      "impact": 3,
+      "effort": 2,
+      "score": 5
     }
   ],
   "taches": [
