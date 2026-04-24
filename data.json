@@ -2,7 +2,7 @@
   "actions": [
     {
       "id": 1,
-      "emoji": "🍻",
+      "emoji": "🍺",
       "titre": "Afterwork INTERNE — 4 mai",
       "categorie": "Réseau / convivialité",
       "date_action": "2026-05-04",
@@ -290,7 +290,7 @@
     {
       "id": 1,
       "action_id": 1,
-      "action_label": "🍻 Afterwork INTERNE — 4 mai",
+      "action_label": "🍺 Afterwork INTERNE — 4 mai",
       "tache": "Confirmer lieu hôte",
       "responsable": "Andy",
       "echeance": "2026-04-27",
@@ -301,7 +301,7 @@
     {
       "id": 2,
       "action_id": 1,
-      "action_label": "🍻 Afterwork INTERNE — 4 mai",
+      "action_label": "🍺 Afterwork INTERNE — 4 mai",
       "tache": "Envoyer invitation adhérents",
       "responsable": "Andy",
       "echeance": "2026-04-30",
@@ -312,7 +312,7 @@
     {
       "id": 4,
       "action_id": 1,
-      "action_label": "🍻 Afterwork INTERNE — 4 mai",
+      "action_label": "🍺 Afterwork INTERNE — 4 mai",
       "tache": "Bilan / photos J+1",
       "responsable": "Andy",
       "echeance": "2026-05-05",
