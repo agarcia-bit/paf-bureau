@@ -558,6 +558,17 @@
       "statut": "À faire",
       "priorite": "Haute",
       "note": ""
+    },
+    {
+      "id": 26,
+      "action_id": 1,
+      "action_label": "🍺 Afterwork INTERNE — 4 mai",
+      "tache": "Bloquer la date",
+      "responsable": "Andy",
+      "echeance": "2026-05-15",
+      "statut": "À faire",
+      "priorite": "Moyenne",
+      "note": ""
     }
   ],
   "adherents": [
