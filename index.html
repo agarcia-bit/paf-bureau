@@ -668,7 +668,8 @@ const PILOTES = ['Fred','Andy','Adélaïde','Luis'];
 function renderTable() {
   const tb = document.getElementById('actBody');
   if (!db.actions.length) { tb.innerHTML='<tr><td colspan="7"><div class="empty">Aucune action</div></td></tr>'; return; }
-  tb.innerHTML = db.actions.map((a,i) => {
+  const sorted = [...db.actions].sort((x, y) => (x.date_action || '9999').localeCompare(y.date_action || '9999'));
+  tb.innerHTML = sorted.map((a,i) => {
     return `<tr>
       <td style="color:var(--muted);font-size:12px">${i+1}</td>
       <td><span class="ed" onclick="inlineEdit(this,${a.id},'emoji')" style="font-size:15px" title="Modifier l'emoji">${a.emoji||'—'}</span><span class="ed" onclick="inlineEdit(this,${a.id},'titre')" style="font-weight:500" title="Cliquer pour renommer">${a.titre}</span><span class="act-go" onclick="openTaches(${a.id})" title="Voir les tâches de cette action">→</span></td>
