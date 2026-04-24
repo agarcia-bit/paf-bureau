@@ -96,6 +96,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .upc-ttl { font-weight: 600; color: var(--ink); font-size: 13px; }
 .upc-cat { font-size: 11px; color: var(--muted); }
 .upc-bgt { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--ink); flex-shrink: 0; }
+.upc-ref { font-size: 12px; color: var(--ink); font-weight: 600; background: rgba(74,124,111,.1); padding: 3px 10px; border-radius: 12px; flex-shrink: 0; }
+.upc-ref.unset { color: var(--muted); background: transparent; font-weight: 400; font-style: italic; }
 .upc-steps { display: flex; flex-direction: column; gap: 4px; padding-top: 4px; border-top: 1px dashed var(--border); }
 .upc-step-row { display: flex; align-items: center; gap: 8px; font-size: 12px; padding: 2px 0; }
 .upc-step-txt { flex: 1; color: var(--ink); }
@@ -323,7 +325,7 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
     <div class="tbl-wrap">
       <table>
         <thead><tr>
-          <th>#</th><th>Action</th><th>Date</th><th>Pilote</th>
+          <th>#</th><th>Action</th><th>Date</th><th>Référent</th>
           <th>Statut</th><th>Budget</th><th>Prochaine étape</th>
         </tr></thead>
         <tbody id="actBody"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
@@ -373,7 +375,7 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
       <div class="ff"><label>Date</label><input id="f-date" type="date"/></div>
       <div class="ff full"><label>Titre</label><input id="f-titre" placeholder="Nom de l'action"/></div>
       <div class="ff"><label>Catégorie</label><input id="f-cat" placeholder="Réseau / convivialité"/></div>
-      <div class="ff"><label>Pilote</label>
+      <div class="ff"><label>Référent</label>
         <select id="f-pilote">
           <option value="">—</option>
           <option>Fred</option><option>Andy</option><option>Adélaïde</option><option>Luis</option>
@@ -535,7 +537,7 @@ function renderEquipe() {
     return `<div class="eq-card">
       <div class="eq-head"><span class="eq-name">${g.person}</span><span class="eq-count">${total}</span></div>
       ${total === 0 ? '<div class="eq-empty">Rien d\'assigné</div>' : ''}
-      ${g.actions.length ? `<div class="eq-sect">📋 Actions pilotées</div>${g.actions.map(buildActionRow).join('')}` : ''}
+      ${g.actions.length ? `<div class="eq-sect">📋 Actions dont ${g.person} est référent</div>${g.actions.map(buildActionRow).join('')}` : ''}
       ${g.taches.length ? `<div class="eq-sect">✅ Tâches</div>${g.taches.map(buildTacheRow).join('')}` : ''}
     </div>`;
   });
@@ -543,7 +545,7 @@ function renderEquipe() {
   if (orphanA.length || orphanT.length) {
     cards.push(`<div class="eq-card eq-orphan">
       <div class="eq-head"><span class="eq-name">Non assigné</span><span class="eq-count">${orphanA.length + orphanT.length}</span></div>
-      ${orphanA.length ? `<div class="eq-sect">📋 Actions sans pilote</div>${orphanA.map(buildActionRow).join('')}` : ''}
+      ${orphanA.length ? `<div class="eq-sect">📋 Actions sans référent</div>${orphanA.map(buildActionRow).join('')}` : ''}
       ${orphanT.length ? `<div class="eq-sect">✅ Tâches sans responsable</div>${orphanT.map(buildTacheRow).join('')}` : ''}
     </div>`);
   }
@@ -599,6 +601,7 @@ function renderUpcoming() {
       <div class="upc-main">
         <div class="upc-head">
           <div class="upc-info"><div class="upc-ttl">${a.titre}</div><div class="upc-cat">${a.categorie||''} · ${a.commission||''}</div></div>
+          <span class="upc-ref${a.pilote ? '' : ' unset'}" title="Référent">👤 ${a.pilote || 'Sans référent'}</span>
           <div class="upc-bgt">${fmt(a.budget)} €</div>
           ${badge(a.statut)}
         </div>
