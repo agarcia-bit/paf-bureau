@@ -168,8 +168,11 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
 .f-sel { border: 1px solid var(--border); border-radius: 8px; padding: 7px 11px; font-size: 13px; font-family: 'DM Sans', sans-serif; background: #fff; outline: none; cursor: pointer; }
 .f-input:focus, .f-sel:focus { border-color: var(--sage); }
 .taches-list { display: flex; flex-direction: column; gap: 7px; }
-.tache { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 13px 17px; display: grid; grid-template-columns: 22px 1fr auto auto auto; gap: 14px; align-items: center; box-shadow: var(--sh); transition: all .2s; }
+.tache { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 13px 17px; display: grid; grid-template-columns: 22px 1fr auto auto auto auto; gap: 14px; align-items: center; box-shadow: var(--sh); transition: all .2s; }
 .t-resp { min-width: 90px; }
+.t-del { background: transparent; border: none; color: var(--muted); font-size: 14px; width: 26px; height: 26px; border-radius: 6px; cursor: pointer; opacity: .4; transition: all .15s; font-family: inherit; padding: 0; }
+.tache:hover .t-del { opacity: 1; }
+.t-del:hover { background: var(--blush); color: #fff; opacity: 1; }
 
 /* NEXT STEPS (in Actions table) */
 .steps { display: flex; flex-direction: column; gap: 4px; min-width: 220px; }
@@ -794,6 +797,7 @@ function renderTaches() {
         ${PILOTES.map(p=>`<option${p===t.responsable?' selected':''}>${p}</option>`).join('')}
       </select>
       <div class="t-date">${fmtDate(t.echeance)}</div>
+      <button class="t-del" onclick="deleteTache(${t.id})" title="Supprimer cette tâche">✕</button>
     </div>`;
   }).join('');
 }
@@ -811,6 +815,15 @@ function toggleTache(id) {
   if(!t) return;
   t.statut = t.statut==='Terminé' ? 'À faire' : 'Terminé';
   renderTaches();
+  scheduleSave();
+}
+
+function deleteTache(id) {
+  const t = db.taches.find(x => x.id === id);
+  if (!t) return;
+  if (!confirm(`Supprimer la tâche « ${t.tache} » ?`)) return;
+  db.taches = db.taches.filter(x => x.id !== id);
+  renderAll();
   scheduleSave();
 }
 
