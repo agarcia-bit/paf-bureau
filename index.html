@@ -796,7 +796,7 @@ function renderTaches() {
         <option value=""${!t.responsable?' selected':''}>—</option>
         ${PILOTES.map(p=>`<option${p===t.responsable?' selected':''}>${p}</option>`).join('')}
       </select>
-      <div class="t-date">${fmtDate(t.echeance)}</div>
+      <div class="t-date"><span class="ed" onclick="inlineEditTacheDate(this,${t.id})" title="Modifier l'échéance">${fmtDate(t.echeance)}</span></div>
       <button class="t-del" onclick="deleteTache(${t.id})" title="Supprimer cette tâche">✕</button>
     </div>`;
   }).join('');
@@ -825,6 +825,18 @@ function deleteTache(id) {
   db.taches = db.taches.filter(x => x.id !== id);
   renderAll();
   scheduleSave();
+}
+
+function inlineEditTacheDate(span, id) {
+  const t = db.taches.find(x => x.id === id);
+  if (!t) return;
+  const inp = document.createElement('input');
+  inp.className = 'ed-input'; inp.type = 'date'; inp.value = t.echeance || ''; inp.style.width = '150px';
+  span.replaceWith(inp); inp.focus();
+  const save = () => updateTache(id, 'echeance', inp.value);
+  inp.addEventListener('blur', save);
+  inp.addEventListener('change', save);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') renderTaches(); });
 }
 
 // ══════════════════════════════════════
