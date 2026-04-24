@@ -155,7 +155,7 @@
     {
       "id": 9,
       "emoji": "🚀",
-      "titre": "Afterwork de rentrée",
+      "titre": "Afterwork de rentrée INTERNE",
       "categorie": "Réseau / relance",
       "date_action": "2026-09-10",
       "mois": "Septembre",
@@ -496,7 +496,7 @@
     {
       "id": 20,
       "action_id": 9,
-      "action_label": "🚀 Afterwork de rentrée",
+      "action_label": "🚀 Afterwork de rentrée INTERNE",
       "tache": "Définir date et angle",
       "responsable": "",
       "echeance": "2026-07-14",
