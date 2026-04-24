@@ -98,7 +98,7 @@
     {
       "id": 6,
       "emoji": "🍹",
-      "titre": "Afterwork juin",
+      "titre": "Afterwork Ouvert juin",
       "categorie": "Réseau / convivialité",
       "date_action": "2026-06-18",
       "mois": "Juin",
@@ -455,7 +455,7 @@
     {
       "id": 18,
       "action_id": 6,
-      "action_label": "🍹 Afterwork juin",
+      "action_label": "🍹 Afterwork Ouvert juin",
       "tache": "Trouver lieu hôte",
       "responsable": "",
       "echeance": "2026-05-22",
@@ -466,7 +466,7 @@
     {
       "id": 19,
       "action_id": 6,
-      "action_label": "🍹 Afterwork juin",
+      "action_label": "🍹 Afterwork Ouvert juin",
       "tache": "Envoyer invitation",
       "responsable": "",
       "echeance": "2026-06-08",
