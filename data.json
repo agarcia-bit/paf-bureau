@@ -284,6 +284,25 @@
       "depense": 0,
       "kpi": "Recettes / fréquentation",
       "prochaine_etape": "Réserver emplacement + valider stands"
+    },
+    {
+      "id": 16,
+      "emoji": "☕️",
+      "titre": "Matinale COMMUNITY MANAGER",
+      "categorie": "Matinale expert",
+      "date_action": "2026-07-06",
+      "mois": "Juillet",
+      "pilote": "Andy",
+      "commission": "",
+      "statut": "À faire",
+      "budget": 500,
+      "depense": 0,
+      "kpi": "",
+      "prochaine_etape": "Bloquer la date",
+      "priorite": 3,
+      "impact": 3,
+      "effort": 2,
+      "score": 5
     }
   ],
   "taches": [
