@@ -787,6 +787,9 @@ function updateAction(id, field, value) {
   if (field === 'date_action' && value) {
     a.mois = new Date(value).toLocaleDateString('fr-FR',{month:'long'}).replace(/^\w/,c=>c.toUpperCase());
   }
+  if (field === 'pilote' && value) {
+    db.taches.forEach(t => { if (t.action_id === id && !t.responsable) t.responsable = value; });
+  }
   renderAll();
   scheduleSave();
 }
@@ -938,9 +941,14 @@ function openModalTache() {
   sel.innerHTML = actions.length
     ? actions.map(a => `<option value="${a.id}">${(a.emoji ? a.emoji + ' ' : '') + a.titre}</option>`).join('')
     : '<option value="">Aucune action — créez-en une d\'abord</option>';
+  sel.onchange = () => {
+    const a = db.actions.find(x => x.id === parseInt(sel.value));
+    document.getElementById('ft-resp').value = a?.pilote || '';
+  };
   document.getElementById('ft-tache').value = '';
   document.getElementById('ft-date').value = '';
-  document.getElementById('ft-resp').value = '';
+  const firstAction = db.actions.find(x => x.id === parseInt(sel.value));
+  document.getElementById('ft-resp').value = firstAction?.pilote || '';
   document.getElementById('ft-prio').value = 'Moyenne';
   document.getElementById('ft-statut').value = 'À faire';
   document.getElementById('modalTBg').classList.add('open');
