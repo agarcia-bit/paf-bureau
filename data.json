@@ -395,7 +395,7 @@
       "tache": "Envoyer email / WhatsApp adhérents",
       "responsable": "Fred",
       "echeance": "2026-05-10",
-      "statut": "À faire",
+      "statut": "Terminé",
       "priorite": "Haute",
       "note": ""
     },
@@ -606,6 +606,17 @@
       "echeance": "2026-05-15",
       "statut": "Terminé",
       "priorite": "Moyenne",
+      "note": ""
+    },
+    {
+      "id": 27,
+      "action_id": 3,
+      "action_label": "💼 Salon de l'emploi — 27 mai",
+      "tache": "Fixer une date",
+      "responsable": "Fred",
+      "echeance": "2026-04-30",
+      "statut": "À faire",
+      "priorite": "Haute",
       "note": ""
     }
   ],
