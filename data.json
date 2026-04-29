@@ -637,6 +637,17 @@
       "statut": "À faire",
       "priorite": "Haute",
       "note": ""
+    },
+    {
+      "id": 28,
+      "action_id": 19,
+      "action_label": "📅 COMPTABLE",
+      "tache": "contacter mairie subvention",
+      "responsable": "Luis",
+      "echeance": "2026-05-29",
+      "statut": "À faire",
+      "priorite": "Basse",
+      "note": ""
     }
   ],
   "adherents": [
