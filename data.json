@@ -648,6 +648,17 @@
       "statut": "À faire",
       "priorite": "Basse",
       "note": ""
+    },
+    {
+      "id": 29,
+      "action_id": 19,
+      "action_label": "📅 COMPTABLE",
+      "tache": "acces banque",
+      "responsable": "Luis",
+      "echeance": "2026-05-29",
+      "statut": "À faire",
+      "priorite": "Moyenne",
+      "note": ""
     }
   ],
   "adherents": [
