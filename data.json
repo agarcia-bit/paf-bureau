@@ -637,6 +637,17 @@
       "statut": "À faire",
       "priorite": "Moyenne",
       "note": ""
+    },
+    {
+      "id": 32,
+      "action_id": 3,
+      "action_label": "💼 Salon de l'emploi — 27 mai",
+      "tache": "Mailing avec fichier N-1",
+      "responsable": "Adélaïde",
+      "echeance": "2026-05-04",
+      "statut": "À faire",
+      "priorite": "Moyenne",
+      "note": ""
     }
   ],
   "adherents": [
