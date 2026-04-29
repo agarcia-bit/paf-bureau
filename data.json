@@ -703,6 +703,17 @@
       "statut": "À faire",
       "priorite": "Moyenne",
       "note": ""
+    },
+    {
+      "id": 38,
+      "action_id": 3,
+      "action_label": "💼 Salon de l'emploi — 27 mai",
+      "tache": "Faire les sandwichs",
+      "responsable": "Andy",
+      "echeance": "",
+      "statut": "À faire",
+      "priorite": "Moyenne",
+      "note": ""
     }
   ],
   "adherents": [
