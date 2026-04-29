@@ -341,6 +341,25 @@
       "impact": 3,
       "effort": 2,
       "score": 5
+    },
+    {
+      "id": 19,
+      "emoji": "📅",
+      "titre": "COMPTABLE",
+      "categorie": "les chiffres",
+      "date_action": "",
+      "mois": "",
+      "pilote": "Luis",
+      "commission": "",
+      "statut": "À faire",
+      "budget": 0,
+      "depense": 0,
+      "kpi": "",
+      "prochaine_etape": "",
+      "priorite": 3,
+      "impact": 3,
+      "effort": 2,
+      "score": 5
     }
   ],
   "taches": [
