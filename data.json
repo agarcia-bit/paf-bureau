@@ -714,6 +714,17 @@
       "statut": "À faire",
       "priorite": "Moyenne",
       "note": ""
+    },
+    {
+      "id": 39,
+      "action_id": 3,
+      "action_label": "💼 Salon de l'emploi — 27 mai",
+      "tache": "Installation salle",
+      "responsable": "Luis",
+      "echeance": "2026-05-07",
+      "statut": "À faire",
+      "priorite": "Moyenne",
+      "note": ""
     }
   ],
   "adherents": [
