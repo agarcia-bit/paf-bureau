@@ -725,6 +725,17 @@
       "statut": "À faire",
       "priorite": "Moyenne",
       "note": ""
+    },
+    {
+      "id": 40,
+      "action_id": 19,
+      "action_label": "📅 COMPTABLE",
+      "tache": "demande de subvention mairie 2026 ou 2027 (apres réponse)",
+      "responsable": "Luis",
+      "echeance": "2026-06-30",
+      "statut": "À faire",
+      "priorite": "Haute",
+      "note": ""
     }
   ],
   "adherents": [
