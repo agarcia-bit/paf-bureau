@@ -209,17 +209,10 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
 .eq-toggle { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12px; font-family: inherit; font-weight: 600; margin-bottom: 14px; transition: all .15s; }
 .eq-toggle:hover { background: var(--card); color: var(--ink); border-color: var(--sage-lt); }
 
-/* ARCHIVE */
-.archive-list { display: flex; flex-direction: column; gap: 9px; }
-.ar-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; box-shadow: var(--sh); opacity: .85; transition: all .2s; }
-.ar-card:hover { opacity: 1; box-shadow: var(--sh2); }
-.ar-emoji { font-size: 22px; flex-shrink: 0; }
-.ar-info { flex: 1; min-width: 0; }
-.ar-ttl { font-weight: 600; color: var(--ink); font-size: 14px; }
-.ar-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
-.ar-stats { font-size: 11px; color: var(--sage); font-weight: 600; background: rgba(74,124,111,.08); padding: 4px 10px; border-radius: 12px; flex-shrink: 0; }
-.ar-reopen { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; font-family: inherit; font-weight: 600; flex-shrink: 0; transition: all .15s; }
-.ar-reopen:hover { background: var(--sage); color: #fff; border-color: var(--sage); }
+/* SEGMENTED TOGGLE */
+.seg { display: inline-flex; background: var(--border); border-radius: 9px; padding: 3px; gap: 3px; margin-bottom: 16px; }
+.seg-btn { background: transparent; border: none; color: var(--muted); padding: 7px 18px; border-radius: 7px; cursor: pointer; font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: all .15s; }
+.seg-btn.on { background: var(--card); color: var(--ink); box-shadow: var(--sh); }
 .tache:hover { box-shadow: var(--sh2); }
 .tck { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
 .tck.done { background: var(--sage); border-color: var(--sage); }
@@ -300,7 +293,6 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
     <button class="nb"     onclick="nav('pilotage',this)">📋 <span>Actions</span></button>
     <button class="nb"     onclick="nav('taches',this)">✅ <span>Tâches</span></button>
     <button class="nb"     onclick="nav('equipe',this)">👥 <span>Équipe</span></button>
-    <button class="nb"     onclick="nav('archive',this)">📦 <span>Archive</span></button>
   </nav>
 </header>
 
@@ -340,13 +332,17 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
       <div><p class="sec-title">Actions 2026</p><p class="sec-sub">Cliquez sur une cellule pour la modifier</p></div>
       <button class="btn-add" onclick="openModal()">+ Nouvelle action</button>
     </div>
+    <div class="seg" id="actSeg">
+      <button class="seg-btn on" id="segActives" onclick="setActionView('actives')">En cours</button>
+      <button class="seg-btn" id="segDone" onclick="setActionView('done')">Terminées</button>
+    </div>
     <div class="tbl-wrap">
       <table>
         <thead><tr>
           <th>#</th><th>Action</th><th>Date</th><th>Référent</th>
-          <th>Statut</th><th>Budget</th><th>Prochaine étape</th>
+          <th>Statut</th><th>Budget</th><th>Prochaine étape</th><th></th>
         </tr></thead>
-        <tbody id="actBody"><tr><td colspan="7"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
+        <tbody id="actBody"><tr><td colspan="8"><div class="loading"><div class="spinner"></div></div></td></tr></tbody>
       </table>
     </div>
   </section>
@@ -384,13 +380,6 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
       <button class="eq-toggle" id="eqToggle" onclick="toggleEquipeDone()">▸ Afficher les terminés</button>
     </div>
     <div class="equipe-grid" id="eqGrid"><div class="loading"><div class="spinner"></div></div></div>
-  </section>
-
-  <!-- ARCHIVE -->
-  <section id="archive" class="section">
-    <p class="sec-title">Archive</p>
-    <p class="sec-sub" id="arSub">Actions terminées</p>
-    <div class="archive-list" id="arList"><div class="loading"><div class="spinner"></div></div></div>
   </section>
 
 </main>
@@ -556,38 +545,7 @@ function openTaches(actionId) {
 // ══════════════════════════════════════
 function renderAll() {
   renderKPIs(); renderUpcoming(); renderCalendar(); renderCharts();
-  renderTable(); renderTaches(); renderEquipe(); renderArchive();
-}
-
-function renderArchive() {
-  const el = document.getElementById('arList');
-  const done = db.actions.filter(a => a.statut === 'Terminé')
-    .sort((x, y) => (y.date_action || '').localeCompare(x.date_action || ''));
-  document.getElementById('arSub').textContent = done.length
-    ? `${done.length} action${done.length>1?'s':''} terminée${done.length>1?'s':''}`
-    : 'Aucune action terminée pour le moment';
-  if (!done.length) { el.innerHTML = '<div class="empty">Rien dans l\'archive</div>'; return; }
-  el.innerHTML = done.map(a => {
-    const taches = db.taches.filter(t => t.action_id === a.id);
-    const tDone = taches.filter(t => t.statut === 'Terminé').length;
-    return `<div class="ar-card">
-      <div class="ar-emoji">${a.emoji||'📅'}</div>
-      <div class="ar-info">
-        <div class="ar-ttl">${a.titre}</div>
-        <div class="ar-meta">${fmtDate(a.date_action)} · ${a.categorie||''} ${a.pilote ? '· 👤 ' + a.pilote : ''}</div>
-      </div>
-      <div class="ar-stats">${tDone}/${taches.length} tâches</div>
-      <button class="ar-reopen" onclick="reopenAction(${a.id})" title="Restaurer cette action">↺ Restaurer</button>
-    </div>`;
-  }).join('');
-}
-
-function reopenAction(id) {
-  const a = db.actions.find(x => x.id === id);
-  if (!a) return;
-  a.statut = 'À faire';
-  renderAll();
-  scheduleSave();
+  renderTable(); renderTaches(); renderEquipe();
 }
 
 let equipeShowDone = false;
@@ -764,12 +722,25 @@ function renderCharts() {
 // TABLE ACTIONS
 // ══════════════════════════════════════
 const PILOTES = ['Fred','Andy','Adélaïde','Luis'];
+let actionView = 'actives';
+function setActionView(view) {
+  actionView = view;
+  document.getElementById('segActives').classList.toggle('on', view === 'actives');
+  document.getElementById('segDone').classList.toggle('on', view === 'done');
+  renderTable();
+}
+
 function renderTable() {
   const tb = document.getElementById('actBody');
-  if (!db.actions.length) { tb.innerHTML='<tr><td colspan="7"><div class="empty">Aucune action</div></td></tr>'; return; }
-  const active = db.actions.filter(a => a.statut !== 'Terminé');
-  if (!active.length) { tb.innerHTML='<tr><td colspan="7"><div class="empty">Aucune action en cours</div></td></tr>'; return; }
-  const sorted = [...active].sort((x, y) => (x.date_action || '9999').localeCompare(y.date_action || '9999'));
+  const done = db.actions.filter(a => a.statut === 'Terminé');
+  document.getElementById('segDone').textContent = `Terminées${done.length ? ' (' + done.length + ')' : ''}`;
+  const list = actionView === 'done' ? done : db.actions.filter(a => a.statut !== 'Terminé');
+  if (!list.length) {
+    const msg = actionView === 'done' ? 'Aucune action terminée' : 'Aucune action en cours';
+    tb.innerHTML = `<tr><td colspan="8"><div class="empty">${msg}</div></td></tr>`;
+    return;
+  }
+  const sorted = [...list].sort((x, y) => (x.date_action || '9999').localeCompare(y.date_action || '9999'));
   tb.innerHTML = sorted.map((a,i) => {
     return `<tr>
       <td style="color:var(--muted);font-size:12px">${i+1}</td>
@@ -789,8 +760,21 @@ function renderTable() {
       </td>
       <td style="white-space:nowrap"><span class="ed" onclick="inlineEditNum(this,${a.id},'budget')" title="Modifier le budget">${fmt(a.budget)} €</span></td>
       <td>${renderNextSteps(a.id)}</td>
+      <td><button class="t-del" onclick="deleteAction(${a.id})" title="Supprimer cette action">✕</button></td>
     </tr>`;
   }).join('');
+}
+
+function deleteAction(id) {
+  const a = db.actions.find(x => x.id === id);
+  if (!a) return;
+  const n = db.taches.filter(t => t.action_id === id).length;
+  const warn = n ? `\n\n${n} tâche${n>1?'s':''} liée${n>1?'s':''} ser${n>1?'ont':'a'} aussi supprimée${n>1?'s':''}.` : '';
+  if (!confirm(`Supprimer l'action « ${a.titre} » ?${warn}`)) return;
+  db.actions = db.actions.filter(x => x.id !== id);
+  db.taches = db.taches.filter(t => t.action_id !== id);
+  renderAll();
+  scheduleSave();
 }
 
 function renderNextSteps(actionId) {
