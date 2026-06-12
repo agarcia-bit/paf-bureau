@@ -769,6 +769,17 @@
       "statut": "Terminé",
       "priorite": "Moyenne",
       "note": ""
+    },
+    {
+      "id": 45,
+      "action_id": 6,
+      "action_label": "🍹 Afterwork OUVERT",
+      "tache": "Appeler les adhérents pour confirmer présence ou non",
+      "responsable": "Andy",
+      "echeance": "2026-06-16",
+      "statut": "À faire",
+      "priorite": "Haute",
+      "note": ""
     }
   ],
   "adherents": [
