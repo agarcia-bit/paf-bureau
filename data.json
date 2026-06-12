@@ -769,17 +769,6 @@
       "statut": "Terminé",
       "priorite": "Moyenne",
       "note": ""
-    },
-    {
-      "id": 45,
-      "action_id": 1,
-      "action_label": "🍺 Afterwork INTERNE — 4 mai",
-      "tache": "Appeler les adhérents pour confirmer",
-      "responsable": "Andy",
-      "echeance": "2026-06-16",
-      "statut": "À faire",
-      "priorite": "Haute",
-      "note": ""
     }
   ],
   "adherents": [
