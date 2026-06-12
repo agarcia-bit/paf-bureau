@@ -172,25 +172,6 @@
       "prochaine_etape": "Cadrer partenariat Girls & Roses + date DJ"
     },
     {
-      "id": 13,
-      "emoji": "❤️",
-      "titre": "Téléthon — action commerçants",
-      "categorie": "Action solidaire",
-      "date_action": "2026-10-29",
-      "mois": "Octobre",
-      "pilote": "Luis",
-      "commission": "2 pers.",
-      "statut": "À faire",
-      "priorite": 3,
-      "impact": 4,
-      "effort": 2,
-      "score": 6,
-      "budget": 400,
-      "depense": 0,
-      "kpi": "Nb commerçants / montant collecté",
-      "prochaine_etape": "Contacter AFM-Téléthon + définir format"
-    },
-    {
       "id": 14,
       "emoji": "🍷",
       "titre": "Beaujolais nouveau",
