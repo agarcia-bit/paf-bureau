@@ -206,6 +206,20 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
 .eq-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
 .eq-row.eq-late { background: rgba(232,112,90,.08); }
 .eq-row.eq-late .eq-date { color: var(--blush); font-weight: 600; }
+.eq-toggle { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 12px; font-family: inherit; font-weight: 600; margin-bottom: 14px; transition: all .15s; }
+.eq-toggle:hover { background: var(--card); color: var(--ink); border-color: var(--sage-lt); }
+
+/* ARCHIVE */
+.archive-list { display: flex; flex-direction: column; gap: 9px; }
+.ar-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; box-shadow: var(--sh); opacity: .85; transition: all .2s; }
+.ar-card:hover { opacity: 1; box-shadow: var(--sh2); }
+.ar-emoji { font-size: 22px; flex-shrink: 0; }
+.ar-info { flex: 1; min-width: 0; }
+.ar-ttl { font-weight: 600; color: var(--ink); font-size: 14px; }
+.ar-meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.ar-stats { font-size: 11px; color: var(--sage); font-weight: 600; background: rgba(74,124,111,.08); padding: 4px 10px; border-radius: 12px; flex-shrink: 0; }
+.ar-reopen { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 11px; font-family: inherit; font-weight: 600; flex-shrink: 0; transition: all .15s; }
+.ar-reopen:hover { background: var(--sage); color: #fff; border-color: var(--sage); }
 .tache:hover { box-shadow: var(--sh2); }
 .tck { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .2s; }
 .tck.done { background: var(--sage); border-color: var(--sage); }
@@ -286,6 +300,7 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
     <button class="nb"     onclick="nav('pilotage',this)">📋 <span>Actions</span></button>
     <button class="nb"     onclick="nav('taches',this)">✅ <span>Tâches</span></button>
     <button class="nb"     onclick="nav('equipe',this)">👥 <span>Équipe</span></button>
+    <button class="nb"     onclick="nav('archive',this)">📦 <span>Archive</span></button>
   </nav>
 </header>
 
@@ -364,9 +379,18 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
 
   <!-- ÉQUIPE -->
   <section id="equipe" class="section">
-    <p class="sec-title">Qui fait quoi</p>
-    <p class="sec-sub" id="eSub">Répartition des actions et tâches par personne</p>
+    <div class="tbl-hdr">
+      <div><p class="sec-title">Qui fait quoi</p><p class="sec-sub" id="eSub">Répartition des actions et tâches par personne</p></div>
+      <button class="eq-toggle" id="eqToggle" onclick="toggleEquipeDone()">▸ Afficher les terminés</button>
+    </div>
     <div class="equipe-grid" id="eqGrid"><div class="loading"><div class="spinner"></div></div></div>
+  </section>
+
+  <!-- ARCHIVE -->
+  <section id="archive" class="section">
+    <p class="sec-title">Archive</p>
+    <p class="sec-sub" id="arSub">Actions terminées</p>
+    <div class="archive-list" id="arList"><div class="loading"><div class="spinner"></div></div></div>
   </section>
 
 </main>
@@ -532,12 +556,51 @@ function openTaches(actionId) {
 // ══════════════════════════════════════
 function renderAll() {
   renderKPIs(); renderUpcoming(); renderCalendar(); renderCharts();
-  renderTable(); renderTaches(); renderEquipe();
+  renderTable(); renderTaches(); renderEquipe(); renderArchive();
+}
+
+function renderArchive() {
+  const el = document.getElementById('arList');
+  const done = db.actions.filter(a => a.statut === 'Terminé')
+    .sort((x, y) => (y.date_action || '').localeCompare(x.date_action || ''));
+  document.getElementById('arSub').textContent = done.length
+    ? `${done.length} action${done.length>1?'s':''} terminée${done.length>1?'s':''}`
+    : 'Aucune action terminée pour le moment';
+  if (!done.length) { el.innerHTML = '<div class="empty">Rien dans l\'archive</div>'; return; }
+  el.innerHTML = done.map(a => {
+    const taches = db.taches.filter(t => t.action_id === a.id);
+    const tDone = taches.filter(t => t.statut === 'Terminé').length;
+    return `<div class="ar-card">
+      <div class="ar-emoji">${a.emoji||'📅'}</div>
+      <div class="ar-info">
+        <div class="ar-ttl">${a.titre}</div>
+        <div class="ar-meta">${fmtDate(a.date_action)} · ${a.categorie||''} ${a.pilote ? '· 👤 ' + a.pilote : ''}</div>
+      </div>
+      <div class="ar-stats">${tDone}/${taches.length} tâches</div>
+      <button class="ar-reopen" onclick="reopenAction(${a.id})" title="Restaurer cette action">↺ Restaurer</button>
+    </div>`;
+  }).join('');
+}
+
+function reopenAction(id) {
+  const a = db.actions.find(x => x.id === id);
+  if (!a) return;
+  a.statut = 'À faire';
+  renderAll();
+  scheduleSave();
+}
+
+let equipeShowDone = false;
+function toggleEquipeDone() {
+  equipeShowDone = !equipeShowDone;
+  document.getElementById('eqToggle').textContent = equipeShowDone ? '▾ Masquer les terminés' : '▸ Afficher les terminés';
+  renderEquipe();
 }
 
 function renderEquipe() {
   const today = new Date().toISOString().split('T')[0];
   const el = document.getElementById('eqGrid');
+  const keep = item => equipeShowDone || item.statut !== 'Terminé';
 
   const buildActionRow = a => {
     const late = a.date_action && a.date_action < today && a.statut !== 'Terminé';
@@ -559,16 +622,16 @@ function renderEquipe() {
   };
 
   const groups = PILOTES.map(person => {
-    const actions = db.actions.filter(a => a.pilote === person)
+    const actions = db.actions.filter(a => a.pilote === person && keep(a))
       .sort((x,y) => (x.date_action||'').localeCompare(y.date_action||''));
-    const taches = db.taches.filter(t => t.responsable === person)
+    const taches = db.taches.filter(t => t.responsable === person && keep(t))
       .sort((x,y) => (x.echeance||'').localeCompare(y.echeance||''));
     return { person, actions, taches };
   });
 
-  const orphanA = db.actions.filter(a => !a.pilote)
+  const orphanA = db.actions.filter(a => !a.pilote && keep(a))
     .sort((x,y) => (x.date_action||'').localeCompare(y.date_action||''));
-  const orphanT = db.taches.filter(t => !t.responsable)
+  const orphanT = db.taches.filter(t => !t.responsable && keep(t))
     .sort((x,y) => (x.echeance||'').localeCompare(y.echeance||''));
 
   const cards = groups.map(g => {
@@ -657,7 +720,7 @@ const MOIS = ['Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','D
 function renderCalendar() {
   const byM = {};
   MOIS.forEach(m => byM[m]=[]);
-  db.actions.forEach(a => { if(byM[a.mois]) byM[a.mois].push(a); });
+  db.actions.forEach(a => { if(byM[a.mois] && a.statut !== 'Terminé') byM[a.mois].push(a); });
   document.getElementById('calGrid').innerHTML = MOIS.map(m => {
     if (!byM[m].length) return '';
     return `<div class="cal-month">
@@ -704,7 +767,9 @@ const PILOTES = ['Fred','Andy','Adélaïde','Luis'];
 function renderTable() {
   const tb = document.getElementById('actBody');
   if (!db.actions.length) { tb.innerHTML='<tr><td colspan="7"><div class="empty">Aucune action</div></td></tr>'; return; }
-  const sorted = [...db.actions].sort((x, y) => (x.date_action || '9999').localeCompare(y.date_action || '9999'));
+  const active = db.actions.filter(a => a.statut !== 'Terminé');
+  if (!active.length) { tb.innerHTML='<tr><td colspan="7"><div class="empty">Aucune action en cours</div></td></tr>'; return; }
+  const sorted = [...active].sort((x, y) => (x.date_action || '9999').localeCompare(y.date_action || '9999'));
   tb.innerHTML = sorted.map((a,i) => {
     return `<tr>
       <td style="color:var(--muted);font-size:12px">${i+1}</td>
