@@ -747,6 +747,17 @@
       "statut": "Terminé",
       "priorite": "Moyenne",
       "note": ""
+    },
+    {
+      "id": 42,
+      "action_id": 1,
+      "action_label": "🍺 Afterwork INTERNE — 4 mai",
+      "tache": "Trouver lieu - Ok chez Fred sur Laléa",
+      "responsable": "Andy",
+      "echeance": "",
+      "statut": "À faire",
+      "priorite": "Moyenne",
+      "note": ""
     }
   ],
   "adherents": [
