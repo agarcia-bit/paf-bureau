@@ -20,25 +20,6 @@
       "prochaine_etape": "Confirmer le lieu hôte"
     },
     {
-      "id": 2,
-      "emoji": "🎉",
-      "titre": "Fêtes de Robersart — COM",
-      "categorie": "Communication / affluence",
-      "date_action": "2026-05-23",
-      "mois": "Mai",
-      "pilote": "Luis",
-      "commission": "2 pers.",
-      "statut": "Terminé",
-      "priorite": 4,
-      "impact": 4,
-      "effort": 1,
-      "score": 16,
-      "budget": 150,
-      "depense": 0,
-      "kpi": "Posts RS + email adhérents",
-      "prochaine_etape": "Rédiger kit com — deadline 7 mai"
-    },
-    {
       "id": 4,
       "emoji": "🌸",
       "titre": "Fête des mères — 31 mai",
@@ -374,50 +355,6 @@
       "responsable": "Fred",
       "echeance": "2026-05-06",
       "statut": "Terminé",
-      "priorite": "Basse",
-      "note": ""
-    },
-    {
-      "id": 5,
-      "action_id": 2,
-      "action_label": "🎉 Fêtes de Robersart — COM",
-      "tache": "Rédiger kit com commerçants",
-      "responsable": "Luis",
-      "echeance": "2026-05-07",
-      "statut": "À faire",
-      "priorite": "Haute",
-      "note": "deadline 7 mai"
-    },
-    {
-      "id": 6,
-      "action_id": 2,
-      "action_label": "🎉 Fêtes de Robersart — COM",
-      "tache": "Envoyer email / WhatsApp adhérents",
-      "responsable": "Fred",
-      "echeance": "2026-05-10",
-      "statut": "Terminé",
-      "priorite": "Haute",
-      "note": ""
-    },
-    {
-      "id": 7,
-      "action_id": 2,
-      "action_label": "🎉 Fêtes de Robersart — COM",
-      "tache": "Posts RS programme + affluence",
-      "responsable": "Luis",
-      "echeance": "2026-05-20",
-      "statut": "À faire",
-      "priorite": "Moyenne",
-      "note": ""
-    },
-    {
-      "id": 8,
-      "action_id": 2,
-      "action_label": "🎉 Fêtes de Robersart — COM",
-      "tache": "Bilan retours commerçants",
-      "responsable": "Luis",
-      "echeance": "2026-05-26",
-      "statut": "À faire",
       "priorite": "Basse",
       "note": ""
     },
