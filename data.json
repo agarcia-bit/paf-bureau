@@ -561,6 +561,17 @@
       "statut": "À faire",
       "priorite": "Haute",
       "note": ""
+    },
+    {
+      "id": 46,
+      "action_id": 6,
+      "action_label": "🍹 Afterwork OUVERT",
+      "tache": "Préparer les fiches et le tableau",
+      "responsable": "Andy",
+      "echeance": "2026-06-15",
+      "statut": "À faire",
+      "priorite": "Moyenne",
+      "note": ""
     }
   ],
   "adherents": [
