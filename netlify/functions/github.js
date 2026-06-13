@@ -3,6 +3,7 @@ export default async (req, context) => {
   const OWNER = 'agarcia-bit';
   const REPO  = 'paf-bureau';
   const FILE  = 'data.json';
+  const BRANCH = 'data'; // data writes/reads target this branch so they never trigger Netlify rebuilds on main
   const API   = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 
   const headers = {
@@ -16,7 +17,7 @@ export default async (req, context) => {
   }
 
   if (req.method === 'GET') {
-    const r = await fetch(API, {
+    const r = await fetch(`${API}?ref=${BRANCH}`, {
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json' }
     });
     const data = await r.json();
@@ -28,6 +29,7 @@ export default async (req, context) => {
 
   if (req.method === 'PUT') {
     const body = await req.json();
+    body.branch = BRANCH; // override whatever the client sent
     const r = await fetch(API, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },

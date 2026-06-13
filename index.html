@@ -484,7 +484,7 @@ async function saveData() {
     const r = await fetch(PROXY, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: 'PAF update', content, sha: ghSha, branch: 'main' })
+      body: JSON.stringify({ message: 'PAF update', content, sha: ghSha, branch: 'data' })
     });
     if (!r.ok) throw new Error(await r.text());
     const data = await r.json();
