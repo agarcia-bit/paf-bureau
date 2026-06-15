@@ -675,5 +675,13 @@
       "statut": "Actif",
       "notes": "Apéro Beaujolais nov 2025"
     }
+  ],
+  "messages": [
+    {
+      "id": 1,
+      "author": "Andy",
+      "text": "Qui utilise l'outil ? :)",
+      "timestamp": "2026-06-15T18:10:56.227Z"
+    }
   ]
 }
