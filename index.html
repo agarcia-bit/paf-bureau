@@ -264,6 +264,35 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .loading { display:flex; flex-direction:column; align-items:center; gap:10px; padding:60px; color:var(--muted); }
 
+/* CHAT */
+.chat { position: fixed; top: 64px; right: 0; bottom: 0; width: 320px; background: var(--card); border-left: 1px solid var(--border); display: none; flex-direction: column; z-index: 90; box-shadow: -4px 0 20px rgba(26,26,46,.06); }
+body.chat-open .chat { display: flex; }
+body.chat-open .main { padding-right: 360px; }
+body.chat-open .chat-open-btn { display: none; }
+.chat-hdr { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.chat-title { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--ink); }
+.chat-collapse { background: transparent; border: none; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; padding: 2px 8px; border-radius: 6px; font-family: inherit; }
+.chat-collapse:hover { background: var(--bg); color: var(--ink); }
+.chat-author { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--bg); border-bottom: 1px solid var(--border); font-size: 12px; }
+.chat-author label { color: var(--muted); font-weight: 600; }
+.chat-author select { flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; font-family: inherit; font-size: 12px; background: #fff; }
+.chat-list { flex: 1; overflow-y: auto; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; }
+.chat-empty { color: var(--muted); font-size: 12px; font-style: italic; text-align: center; margin-top: 24px; }
+.msg { background: var(--bg); border-radius: 10px; padding: 8px 12px; font-size: 13px; line-height: 1.4; word-wrap: break-word; }
+.msg-hdr { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 3px; font-size: 11px; }
+.msg-author { color: var(--sage); font-weight: 700; }
+.msg-time { color: var(--muted); }
+.msg-body { color: var(--ink); white-space: pre-wrap; }
+.msg.mine { background: rgba(74,124,111,.1); }
+.msg.mine .msg-author { color: var(--ink); }
+.chat-input { display: flex; gap: 6px; padding: 10px 12px; border-top: 1px solid var(--border); background: #fff; }
+.chat-input textarea { flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; font-family: inherit; font-size: 13px; resize: none; outline: none; }
+.chat-input textarea:focus { border-color: var(--sage-lt); }
+.chat-send { background: var(--sage); color: #fff; border: none; border-radius: 8px; width: 36px; cursor: pointer; font-size: 16px; font-weight: 700; flex-shrink: 0; }
+.chat-send:hover { background: var(--sage-lt); }
+.chat-open-btn { position: fixed; bottom: 24px; right: 24px; width: 50px; height: 50px; border-radius: 50%; background: var(--sage); color: #fff; border: none; font-size: 22px; cursor: pointer; box-shadow: 0 6px 20px rgba(26,26,46,.18); z-index: 90; transition: all .2s; }
+.chat-open-btn:hover { background: var(--sage-lt); transform: translateY(-2px); }
+
 @media(max-width:900px) {
   .main { padding:20px; }
   .kpi-grid { grid-template-columns:1fr 1fr; }
@@ -271,6 +300,8 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
   .cal-grid { grid-template-columns:1fr 1fr; }
   .hdr { padding:0 20px; }
   .nb span { display:none; }
+  body.chat-open .main { padding-right: 20px; }
+  .chat { width: 100%; }
 }
 </style>
 </head>
@@ -384,6 +415,27 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
 
 </main>
 
+<!-- CHAT PANEL -->
+<aside class="chat" id="chatPanel">
+  <div class="chat-hdr">
+    <span class="chat-title">💬 Chat équipe</span>
+    <button class="chat-collapse" onclick="toggleChat()" title="Replier">×</button>
+  </div>
+  <div class="chat-author">
+    <label>Je suis :</label>
+    <select id="chatAuthor" onchange="setChatAuthor(this.value)">
+      <option value="">—</option>
+      <option>Fred</option><option>Andy</option><option>Adélaïde</option><option>Luis</option>
+    </select>
+  </div>
+  <div class="chat-list" id="chatList"></div>
+  <div class="chat-input">
+    <textarea id="chatText" placeholder="Message…" rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}"></textarea>
+    <button class="chat-send" onclick="sendMessage()" title="Envoyer">↑</button>
+  </div>
+</aside>
+<button class="chat-open-btn" id="chatOpenBtn" onclick="toggleChat()" title="Ouvrir le chat">💬</button>
+
 <!-- MODAL -->
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
   <div class="modal">
@@ -455,10 +507,105 @@ tbody td { padding: 11px 13px; vertical-align: top; font-size: 13px; }
 // ══════════════════════════════════════
 const PROXY = '/api/github';
 
-let db = { actions: [], taches: [], adherents: [] };
+let db = { actions: [], taches: [], adherents: [], messages: [] };
 let ghSha = null;
 let charts = {};
 let saveTimer = null;
+
+// ══════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════
+let chatAuthor = localStorage.getItem('chatAuthor') || '';
+const POLL_INTERVAL_MS = 20000;
+let pollTimer = null;
+
+function setChatAuthor(name) {
+  chatAuthor = name;
+  if (name) localStorage.setItem('chatAuthor', name); else localStorage.removeItem('chatAuthor');
+  renderChat();
+}
+
+function toggleChat() {
+  const open = document.body.classList.toggle('chat-open');
+  localStorage.setItem('chatOpen', open ? '1' : '0');
+  if (open) {
+    requestAnimationFrame(scrollChatToBottom);
+    document.getElementById('chatText').focus();
+  }
+}
+
+function scrollChatToBottom() {
+  const list = document.getElementById('chatList');
+  list.scrollTop = list.scrollHeight;
+}
+
+function fmtMsgTime(iso) {
+  const d = new Date(iso);
+  const now = new Date();
+  const sameDay = d.toDateString() === now.toDateString();
+  if (sameDay) return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  const dayMs = 86400000;
+  const yest = new Date(now - dayMs).toDateString() === d.toDateString();
+  if (yest) return 'hier ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }) + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function renderChat() {
+  const sel = document.getElementById('chatAuthor');
+  if (sel.value !== chatAuthor) sel.value = chatAuthor;
+  const list = document.getElementById('chatList');
+  const msgs = (db.messages || []).slice().sort((a, b) => (a.timestamp || '').localeCompare(b.timestamp || ''));
+  if (!msgs.length) { list.innerHTML = '<div class="empty chat-empty">Aucun message — démarrez la conversation</div>'; return; }
+  const wasNearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+  list.innerHTML = msgs.map(m => `<div class="msg${m.author === chatAuthor ? ' mine' : ''}">
+    <div class="msg-hdr"><span class="msg-author">${escapeHtml(m.author || '—')}</span><span class="msg-time">${fmtMsgTime(m.timestamp)}</span></div>
+    <div class="msg-body">${escapeHtml(m.text || '')}</div>
+  </div>`).join('');
+  if (wasNearBottom) scrollChatToBottom();
+}
+
+function sendMessage() {
+  const ta = document.getElementById('chatText');
+  const text = ta.value.trim();
+  if (!text) return;
+  if (!chatAuthor) { alert('Choisis ton prénom avant d\'envoyer.'); return; }
+  if (!Array.isArray(db.messages)) db.messages = [];
+  const newId = Math.max(0, ...db.messages.map(m => m.id || 0)) + 1;
+  db.messages.push({ id: newId, author: chatAuthor, text, timestamp: new Date().toISOString() });
+  ta.value = '';
+  renderChat();
+  scheduleSave();
+}
+
+async function pollChat() {
+  if (saveTimer) return; // a save is pending, don't risk clobbering local edits
+  try {
+    const r = await fetch(PROXY);
+    if (!r.ok) return;
+    const meta = await r.json();
+    const raw = meta.content.replace(/\n/g, '');
+    const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
+    const fresh = JSON.parse(new TextDecoder('utf-8').decode(bytes));
+    ghSha = meta.sha;
+    const remoteMsgs = Array.isArray(fresh.messages) ? fresh.messages : [];
+    const localIds = new Set((db.messages || []).map(m => m.id));
+    const merged = (db.messages || []).concat(remoteMsgs.filter(m => !localIds.has(m.id)));
+    db.messages = merged;
+    renderChat();
+  } catch(e) { /* silent — keep polling */ }
+}
+
+function startChat() {
+  if (localStorage.getItem('chatOpen') !== '0') document.body.classList.add('chat-open');
+  document.getElementById('chatAuthor').value = chatAuthor;
+  renderChat();
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(pollChat, POLL_INTERVAL_MS);
+}
 
 async function loadData() {
   try {
@@ -469,6 +616,7 @@ async function loadData() {
     const raw = meta.content.replace(/\n/g, '');
     const bytes = Uint8Array.from(atob(raw), c => c.charCodeAt(0));
     db = JSON.parse(new TextDecoder('utf-8').decode(bytes));
+    if (!Array.isArray(db.messages)) db.messages = [];
     renderAll();
   } catch(e) {
     console.error(e);
@@ -545,7 +693,7 @@ function openTaches(actionId) {
 // ══════════════════════════════════════
 function renderAll() {
   renderKPIs(); renderUpcoming(); renderCalendar(); renderCharts();
-  renderTable(); renderTaches(); renderEquipe();
+  renderTable(); renderTaches(); renderEquipe(); renderChat();
 }
 
 let equipeShowDone = false;
@@ -1077,7 +1225,8 @@ function loadDemo() {
       {id:8,entreprise:'Monarc Consulting — Audrey GEMELINE',secteur:'Conseil / coaching',telephone:'06.58.29.97.96',email:'',adhesion:2026,statut:'Bureau',notes:'Secrétaire'},
       {id:9,entreprise:'DLM Location',secteur:'Location véhicules',telephone:'',email:'',adhesion:2026,statut:'Actif',notes:'Afterwork rentrée sept 2025'},
       {id:10,entreprise:'NPC',secteur:'Assurance',telephone:'',email:'',adhesion:2026,statut:'Actif',notes:'Apéro Beaujolais nov 2025'},
-    ]
+    ],
+    messages: []
   };
   renderAll();
 }
@@ -1092,7 +1241,7 @@ function badge(s) {
   return `<span class="badge ${m[s]||''}">${s}</span>`;
 }
 
-loadData();
+loadData().then(startChat);
 </script>
 </body>
 </html>
